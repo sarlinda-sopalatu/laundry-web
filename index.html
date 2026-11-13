@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#1F618D" />
+  <meta
+    name="description"
+    content="Laundry Kilat — aplikasi kasir laundry berbasis web. Kelola pelanggan, layanan, quality control, pembayaran, nota, dan label QR."
+  />
+  <title>Laundry Kilat — Aplikasi Kasir Laundry</title>
+  <link
+    rel="icon"
+    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%231F618D'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle'%3E%F0%9F%A7%BA%3C/text%3E%3C/svg%3E"
+  />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="site">
+    <!-- Panel branding desktop (tersembunyi di layar kecil) -->
+    <aside class="site-brand" aria-label="Tentang aplikasi">
+      <div class="brand-mark">🧺</div>
+      <h1>Laundry Kilat</h1>
+      <p class="brand-tagline">
+        Aplikasi kasir laundry lengkap — dari data pelanggan sampai nota dan
+        label QR, dalam satu alur yang cepat dan rapi.
+      </p>
+      <ul class="brand-features">
+        <li><span>👤</span> Profil &amp; pencarian pelanggan</li>
+        <li><span>🧺</span> Layanan, paket kecepatan, katalog barang</li>
+        <li><span>📷</span> Quality control dengan foto &amp; catatan</li>
+        <li><span>💰</span> Harga otomatis, voucher, DP &amp; pelunasan</li>
+        <li><span>🧾</span> Nota cetak, PDF, dan WhatsApp</li>
+        <li><span>🏷️</span> Label cucian dengan QR code</li>
+      </ul>
+      <div class="brand-version">Versi Web · HTML · CSS · JavaScript</div>
+    </aside>
+
+    <!-- Bingkai aplikasi (menyerupai layar ponsel di desktop) -->
+    <div class="phone-shell">
+      <div class="phone-frame" id="phone-frame">
+        <!-- Header ala React Navigation (disembunyikan di Beranda) -->
+        <header class="app-header hidden" id="app-header">
+          <button class="header-back" id="btn-back" type="button" aria-label="Kembali">
+            ‹
+          </button>
+          <h1 class="header-title" id="header-title">Beranda</h1>
+          <div class="header-right" aria-hidden="true"></div>
+        </header>
+
+        <main class="screens" id="screens">
+          <!-- ============================================================
+               SCREEN 1 — BERANDA & RIWAYAT PESANAN
+          ============================================================= -->
+          <section class="screen active" id="screen-home">
+            <div class="hero">
+              <h1 class="hero-title">Laundry Kilat</h1>
+              <p class="hero-subtitle">Kelola cucian dengan cepat &amp; rapi</p>
+            </div>
+
+            <div class="stats-row">
+              <div class="stat-card">
+                <div class="stat-value" id="stat-total-orders">0</div>
+                <div class="stat-label">Total Pesanan</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value" id="stat-revenue">Rp 0</div>
+                <div class="stat-label">Pendapatan Hari Ini</div>
+              </div>
+            </div>
+
+            <button class="btn btn-primary btn-cta" id="btn-new-order" type="button">
+              <span class="cta-plus">＋</span>
+              <span>Transaksi Baru</span>
+            </button>
+
+            <h2 class="section-title home-section-title">Pesanan Terbaru</h2>
+
+            <div class="orders-list" id="orders-list"></div>
+
+            <div class="empty-box" id="orders-empty">
+              <p class="empty-text">Belum ada pesanan.</p>
+              <p class="empty-sub">Tap “Transaksi Baru” untuk mulai.</p>
+            </div>
+          </section>
+
+          <!-- ============================================================
+               SCREEN 2 — INPUT DATA PELANGGAN
+          ============================================================= -->
+          <section class="screen" id="screen-customer">
+            <div class="screen-body">
+              <div class="card card-customer">
+                <p class="card-badge">1. Cari Pelanggan Lama</p>
+                <input
+                  class="input"
+                  id="customer-search"
+                  type="search"
+                  placeholder="Ketik nama atau nomor WhatsApp..."
+                  autocomplete="off"
+                />
+                <button class="btn btn-outline btn-block walkin-btn" id="btn-walkin" type="button">
+                  Lewati (Walk-in tanpa data)
+                </button>
+              </div>
+
+              <div class="card card-customer">
+                <p class="card-badge">2. Pelanggan Baru</p>
+
+                <label class="label" for="cust-name">Nama Pelanggan *</label>
+                <input
+                  class="input"
+                  id="cust-name"
+                  type="text"
+                  placeholder="Contoh: Budi Santoso"
+                  autocomplete="name"
+                />
+
+                <label class="label" for="cust-phone">No. WhatsApp / Telepon *</label>
+                <input
+                  class="input"
+                  id="cust-phone"
+                  type="tel"
+                  placeholder="Contoh: 081234567890"
+                  inputmode="tel"
+                  autocomplete="tel"
+                />
+
+                <label class="label" for="cust-address">Alamat</label>
+                <textarea
+                  class="input textarea"
+                  id="cust-address"
+                  rows="2"
+                  placeholder="Opsional untuk walk-in"
+                  autocomplete="street-address"
+                ></textarea>
+
+                <div class="switch-row">
+                  <div class="switch-copy">
+                    <div class="switch-label">Antar-jemput (pickup/delivery)</div>
+                    <div class="switch-hint">Alamat wajib diisi jika diaktifkan</div>
+                  </div>
+                  <label class="switch" for="cust-pickup">
+                    <input type="checkbox" id="cust-pickup" />
+                    <span class="switch-slider" aria-hidden="true"></span>
+                  </label>
+                </div>
+
+                <button class="btn btn-primary btn-block" id="btn-save-customer" type="button">
+                  Simpan &amp; Pilih Layanan
+                </button>
+              </div>
+
+              <h2 class="list-title">Pelanggan Tersimpan</h2>
+              <div class="customers-list" id="customers-list"></div>
+              <p class="empty-text customers-empty hidden" id="customers-empty">
+                Belum ada pelanggan tersimpan.
+              </p>
+            </div>
+          </section>
+
+          <!-- ============================================================
+               SCREEN 3 — DETAIL LAYANAN
+          ============================================================= -->
+          <section class="screen" id="screen-service">
+            <div class="screen-body">
+              <div class="customer-bar">
+                <div class="customer-label">Pelanggan</div>
+                <div class="customer-name" id="service-customer-name">Walk-in</div>
+                <div class="customer-phone" id="service-customer-phone"></div>
+              </div>
+
+              <h2 class="section-title">Tipe Layanan</h2>
+              <div class="service-grid" id="service-grid"></div>
+
+              <h2 class="section-title">Paket Kecepatan</h2>
+              <div class="speed-row" id="speed-row"></div>
+
+              <div id="item-section">
+                <h2 class="section-title">Katalog Barang</h2>
+                <div class="item-grid" id="item-grid"></div>
+              </div>
+
+              <button class="btn btn-primary btn-block screen-cta" id="btn-service-next" type="button">
+                Lanjut ke Kuantitas
+              </button>
+            </div>
+          </section>
+
+          <!-- ============================================================
+               SCREEN 4 — KUANTITAS & UKURAN
+          ============================================================= -->
+          <section class="screen" id="screen-quantity">
+            <div class="screen-body">
+              <div class="summary-card" id="quantity-summary"></div>
+
+              <div class="card card-quantity" id="weight-card">
+                <label class="label" for="input-weight">Berat Cucian (Kg)</label>
+                <div class="input-row">
+                  <input
+                    class="big-input"
+                    id="input-weight"
+                    type="text"
+                    inputmode="decimal"
+                    placeholder="0.0"
+                    autocomplete="off"
+                  />
+                  <span class="input-suffix">kg</span>
+                </div>
+                <p class="hint">
+                  Masukkan berat manual (integrasi timbangan Bluetooth dapat
+                  ditambahkan pada development build).
+                </p>
+              </div>
+
+              <div class="card card-quantity hidden" id="quantity-card">
+                <label class="label" for="input-quantity">Jumlah Barang (Pcs)</label>
+                <div class="input-row">
+                  <input
+                    class="big-input"
+                    id="input-quantity"
+                    type="text"
+                    inputmode="numeric"
+                    placeholder="0"
+                    autocomplete="off"
+                  />
+                  <span class="input-suffix">pcs</span>
+                </div>
+              </div>
+
+              <div class="card card-quantity">
+                <label class="label" for="input-pcs">
+                  Jumlah Helai Pakaian (Pcs) — untuk verifikasi serah-terima
+                </label>
+                <div class="input-row">
+                  <input
+                    class="small-input"
+                    id="input-pcs"
+                    type="text"
+                    inputmode="numeric"
+                    placeholder="0"
+                    autocomplete="off"
+                  />
+                  <span class="input-suffix">pcs</span>
+                </div>
+                <p class="hint hidden" id="pcs-hint">
+                  Jumlah pcs mengikuti jumlah barang di atas.
+                </p>
+              </div>
+
+              <div class="estimate-card">
+                <div class="estimate-label">Estimasi Biaya</div>
+                <div class="estimate-value" id="estimate-value">Rp 0</div>
+                <div class="estimate-note">*Belum termasuk diskon/voucher</div>
+              </div>
+
+              <button class="btn btn-primary btn-block screen-cta" id="btn-quantity-next" type="button">
+                Lanjut ke Quality Control
+              </button>
+            </div>
+          </section>
+
+          <!-- ============================================================
+               SCREEN 5 — QUALITY CONTROL
+          ============================================================= -->
+          <section class="screen" id="screen-quality">
+            <div class="screen-body">
+              <div class="card">
+                <p class="card-badge">Dokumentasi Kondisi Barang</p>
+
+                <img class="photo hidden" id="photo-preview" alt="Foto kondisi barang" />
+
+                <div class="photo-placeholder" id="photo-placeholder">
+                  <div class="photo-placeholder-icon">📷</div>
+                  <p class="photo-placeholder-text">
+                    Foto kondisi awal barang (opsional namun disarankan)
+                  </p>
+                </div>
+
+                <div class="photo-buttons">
+                  <button class="btn btn-primary photo-btn" id="btn-camera" type="button">
+                    Ambil Foto
+                  </button>
+                  <button class="btn btn-secondary photo-btn" id="btn-gallery" type="button">
+                    Dari Galeri
+                  </button>
+                </div>
+
+                <button class="link-danger hidden" id="btn-remove-photo" type="button">
+                  Hapus foto
+                </button>
+
+                <input type="file" id="camera-input" class="file-input" accept="image/*" capture="environment" tabindex="-1" />
+                <input type="file" id="gallery-input" class="file-input" accept="image/*" tabindex="-1" />
+              </div>
+
+              <div class="card">
+                <p class="card-badge">Kondisi Barang</p>
+                <div class="chips" id="condition-chips"></div>
+              </div>
+
+              <div class="card">
+                <p class="card-badge">Catatan Khusus</p>
+                <textarea
+                  class="input textarea notes-input"
+                  id="quality-notes"
+                  rows="4"
+                  placeholder="Contoh: noda darah di kerah, jangan pakai pemutih..."
+                ></textarea>
+              </div>
+
+              <button class="btn btn-primary btn-block screen-cta" id="btn-quality-next" type="button">
+                Lanjut ke Kalkulasi Harga
+              </button>
+            </div>
+          </section>
+
+          <!-- ============================================================
+               SCREEN 6 — KALKULASI & PEMBAYARAN
+          ============================================================= -->
+          <section class="screen" id="screen-calculation">
+            <div class="screen-body">
+              <div class="card">
+                <p class="card-badge">Rincian Biaya</p>
+                <div id="pricing-rows"></div>
+                <div class="total-row">
+                  <span class="total-label">TOTAL</span>
+                  <span class="total-value" id="total-value">Rp 0</span>
+                </div>
+                <p class="discount-note hidden" id="discount-note"></p>
+              </div>
+
+              <div class="card">
+                <p class="card-badge">Voucher / Diskon</p>
+                <div class="voucher-row">
+                  <input
+                    class="input voucher-input"
+                    id="voucher-code"
+                    type="text"
+                    placeholder="Kode promo (mis. HEMAT10)"
+                    autocomplete="off"
+                  />
+                  <button class="btn btn-primary apply-btn" id="btn-apply-voucher" type="button">
+                    Pakai
+                  </button>
+                </div>
+                <p class="voucher-applied hidden" id="voucher-applied"></p>
+                <p class="hint" id="voucher-hint">Coba: HEMAT10, LAUNDRY5K, SETIA15</p>
+
+                <label class="label" for="manual-discount">Diskon Manual (Rp)</label>
+                <input
+                  class="input"
+                  id="manual-discount"
+                  type="text"
+                  inputmode="numeric"
+                  placeholder="0"
+                  autocomplete="off"
+                />
+              </div>
+
+              <div class="card">
+                <p class="card-badge">Status Pembayaran</p>
+                <div class="status-row" id="payment-status-row"></div>
+
+                <div class="dp-block hidden" id="dp-block">
+                  <label class="label" for="paid-amount">Nominal DP (Rp)</label>
+                  <input
+                    class="input"
+                    id="paid-amount"
+                    type="text"
+                    inputmode="numeric"
+                    placeholder="Contoh: 20000"
+                    autocomplete="off"
+                  />
+                  <p class="hint" id="remaining-hint">Sisa tagihan: Rp 0</p>
+                </div>
+              </div>
+
+              <div class="card">
+                <p class="card-badge">Metode Pembayaran</p>
+                <div class="method-grid" id="payment-method-grid"></div>
+              </div>
+
+              <button class="btn btn-primary btn-block screen-cta" id="btn-calculation-next" type="button">
+                Lanjut ke Penjadwalan
+              </button>
+            </div>
+          </section>
+
+          <!-- ============================================================
+               SCREEN 7 — PENJADWALAN
+          ============================================================= -->
+          <section class="screen" id="screen-scheduling">
+            <div class="screen-body">
+              <div class="card">
+                <p class="card-badge">Ringkasan Pesanan</p>
+                <div id="schedule-summary"></div>
+              </div>
+
+              <div class="card">
+                <p class="card-badge">Tanggal Masuk</p>
+                <div class="date-big" id="entry-date-label">-</div>
+                <p class="hint">Otomatis tercatat hari ini saat transaksi dibuat.</p>
+              </div>
+
+              <div class="estimate-card-dark">
+                <div class="badge-light">Estimasi Selesai</div>
+                <div class="estimate-date" id="estimate-date-label">-</div>
+                <div class="estimate-time" id="estimate-time-label">Pukul -</div>
+                <div class="estimate-note-dark" id="estimate-note-label"></div>
+              </div>
+
+              <div class="pickup-card hidden" id="pickup-card">
+                <div class="pickup-title">🚚 Layanan Antar-Jemput</div>
+                <div class="pickup-address" id="pickup-address">-</div>
+              </div>
+
+              <button class="btn btn-primary btn-block screen-cta" id="btn-scheduling-next" type="button">
+                Simpan &amp; Buat Nota
+              </button>
+            </div>
+          </section>
+
+          <!-- ============================================================
+               SCREEN 8 — NOTA LAUNDRY
+          ============================================================= -->
+          <section class="screen" id="screen-receipt">
+            <div class="screen-body">
+              <div class="status-bar hidden" id="receipt-status-bar">
+                <span class="status-bar-label">Status Pesanan:</span>
+                <span class="status-bar-value" id="receipt-status-value">Diproses</span>
+              </div>
+
+              <div class="receipt" id="receipt-card">
+                <div class="shop-name">LAUNDRY KILAT</div>
+                <div class="shop-address">Jl. Contoh No. 123, Kota Anda</div>
+                <div class="shop-address">Telp: 0812-3456-7890</div>
+
+                <div class="dashed"></div>
+
+                <div class="receipt-row">
+                  <span class="receipt-label">No. Resi</span>
+                  <span class="receipt-value receipt-value-bold" id="receipt-number">-</span>
+                </div>
+                <div class="receipt-row">
+                  <span class="receipt-label">Tanggal</span>
+                  <span class="receipt-value" id="receipt-date">-</span>
+                </div>
+                <div class="receipt-row">
+                  <span class="receipt-label">Pelanggan</span>
+                  <span class="receipt-value" id="receipt-customer">Walk-in</span>
+                </div>
+                <div class="receipt-row" id="receipt-phone-row">
+                  <span class="receipt-label">Telepon</span>
+                  <span class="receipt-value" id="receipt-phone">-</span>
+                </div>
+
+                <div class="dashed"></div>
+
+                <div class="receipt-row">
+                  <span class="receipt-label">Layanan</span>
+                  <span class="receipt-value" id="receipt-service">-</span>
+                </div>
+                <div class="receipt-row">
+                  <span class="receipt-label">Paket</span>
+                  <span class="receipt-value" id="receipt-speed">-</span>
+                </div>
+                <div class="receipt-row hidden" id="receipt-item-row">
+                  <span class="receipt-label">Barang</span>
+                  <span class="receipt-value" id="receipt-item">-</span>
+                </div>
+                <div class="receipt-row">
+                  <span class="receipt-label" id="receipt-qty-label">Berat</span>
+                  <span class="receipt-value" id="receipt-qty-value">-</span>
+                </div>
+                <div class="receipt-row hidden" id="receipt-pcs-row">
+                  <span class="receipt-label">Jumlah Pcs</span>
+                  <span class="receipt-value" id="receipt-pcs-value">-</span>
+                </div>
+
+                <div class="dashed"></div>
+
+                <div class="receipt-row">
+                  <span class="receipt-label">Subtotal</span>
+                  <span class="receipt-value" id="receipt-subtotal">Rp 0</span>
+                </div>
+                <div class="receipt-row">
+                  <span class="receipt-label">Diskon</span>
+                  <span class="receipt-value" id="receipt-discount">- Rp 0</span>
+                </div>
+                <div class="total-row receipt-total-row">
+                  <span class="total-label">TOTAL</span>
+                  <span class="receipt-total" id="receipt-total">Rp 0</span>
+                </div>
+                <div class="receipt-row">
+                  <span class="receipt-label">Pembayaran</span>
+                  <span class="receipt-value" id="receipt-payment-status">-</span>
+                </div>
+                <div class="receipt-row">
+                  <span class="receipt-label">Metode</span>
+                  <span class="receipt-value" id="receipt-payment-method">-</span>
+                </div>
+                <div class="receipt-row hidden" id="receipt-remaining-row">
+                  <span class="receipt-label">Sisa Tagihan</span>
+                  <span class="receipt-value receipt-value-bold" id="receipt-remaining">Rp 0</span>
+                </div>
+
+                <div class="dashed"></div>
+
+                <div class="estimate-box">
+                  <div class="estimate-title">Estimasi Selesai</div>
+                  <div class="estimate-value" id="receipt-estimate">-</div>
+                </div>
+
+                <div class="hidden" id="receipt-notes-block">
+                  <div class="dashed"></div>
+                  <div class="notes-label">Catatan:</div>
+                  <div class="notes-value" id="receipt-notes"></div>
+                </div>
+
+                <div class="dashed"></div>
+                <div class="thanks">Terima kasih telah menggunakan layanan kami</div>
+              </div>
+
+              <button class="btn btn-block action-btn hidden" id="btn-status-action" type="button"></button>
+
+              <div class="actions">
+                <button class="btn btn-block action-btn btn-action-print" id="btn-print" type="button">
+                  🖨️ Cetak Struk
+                </button>
+                <button class="btn btn-block action-btn btn-action-pdf" id="btn-pdf" type="button">
+                  📄 Simpan / Bagikan PDF
+                </button>
+                <button class="btn btn-block action-btn btn-action-wa" id="btn-wa" type="button">
+                  💬 Kirim via WhatsApp
+                </button>
+                <button class="btn btn-block action-btn btn-action-tag" id="btn-tag" type="button">
+                  🏷️ Buat Label Cucian
+                </button>
+              </div>
+
+              <button class="btn btn-outline btn-block finish-btn" id="btn-finish" type="button">
+                Selesai &amp; Kembali ke Beranda
+              </button>
+            </div>
+          </section>
+
+          <!-- ============================================================
+               SCREEN 9 — LABEL CUCIAN (QR)
+          ============================================================= -->
+          <section class="screen" id="screen-tag">
+            <div class="screen-body">
+              <p class="tag-hint">
+                Tempel label ini pada keranjang atau tag pakaian agar tidak
+                tertukar. QR code berisi nomor resi dan nama pelanggan.
+              </p>
+
+              <div class="tag-preview">
+                <div class="qr-box" id="qr-code"></div>
+                <div class="tag-info">
+                  <div class="tag-resi" id="tag-resi">-</div>
+                  <div class="tag-name" id="tag-name">Walk-in</div>
+                  <div class="tag-muted" id="tag-service">- • -</div>
+                  <div class="tag-muted" id="tag-qty">0 pcs</div>
+                  <div class="tag-muted" id="tag-estimate">Est: -</div>
+                </div>
+              </div>
+
+              <button class="btn btn-block btn-label-print" id="btn-print-label" type="button">
+                🖨️ Cetak Label (Ukuran Kecil)
+              </button>
+              <button class="btn btn-block btn-label-pdf" id="btn-label-pdf" type="button">
+                📄 Simpan / Bagikan Label PDF
+              </button>
+              <button class="btn btn-ghost btn-block" id="btn-tag-home" type="button">
+                Kembali ke Beranda
+              </button>
+            </div>
+          </section>
+        </main>
+
+        <!-- Toast notifikasi -->
+        <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+        <!-- Dialog pengganti Alert React Native -->
+        <div class="overlay hidden" id="dialog-overlay">
+          <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="dialog-title">
+            <h3 class="dialog-title" id="dialog-title">Peringatan</h3>
+            <p class="dialog-message" id="dialog-message"></p>
+            <button class="btn btn-primary btn-block" id="dialog-ok" type="button">OK</button>
+          </div>
+        </div>
+      </div>
+
+      <p class="phone-caption">Aplikasi web · HTML · CSS · JavaScript murni</p>
+    </div>
+  </div>
+
+  <script src="js/vendor/qrcode.min.js"></script>
+  <script src="js/catalog.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
